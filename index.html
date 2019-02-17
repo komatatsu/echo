@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <script src=https://cdn.jsdelivr.net/npm/vue></script>
+      <title>調声さん</title>
+  </head>
+  <body>
+    <audio id=player controls></audio>
+    <div id=app>
+      <recorder></recorder>
+    </div>
+  </body>
+  <script>
+    Vue.component('recorder', {
+      template: `
+      <div>
+        <template v-if=recording>
+          <button v-on:click="stop">停止</button>
+        </template>
+        <template v-else>
+          <button v-on:click="rec">録音</button>
+        </template>
+      </div>
+      `,
+      data: function() {
+        return {
+          recording: false,
+          recorder: null
+        }
+      },
+      methods: {
+        stop: function() {
+          this.recording = false;
+          recorder.stop();
+        },
+        rec: function() {
+          this.recording = true;
+          navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+          navigator.getUserMedia(
+            {
+              audio: true,
+              video: false
+            },
+            function(stream) {
+              var buffer = [];
+              recorder = new MediaRecorder(stream, {
+                mimeType: 'video/webm;codecs=vp9'
+              });
+              recorder.addEventListener('dataavailable', function(ele) {
+                if (ele.data.size > 0) {
+                  buffer.push(ele.data);
+                }
+              });
+              recorder.addEventListener('stop', function() {
+                var player = document.querySelector("#player");
+                var url = URL.createObjectURL(new Blob(buffer));
+                if (player.src) {
+                  window.URL.revokeObjectURL(player.src);
+                  player.src = null;
+                }
+                player.src = url;
+                player.play();
+                this.recording = true;
+              });
+              recorder.start();
+            }, 
+            function() {
+              alert("無理");
+            }
+          );
+        }
+      }
+    })
+    new Vue({ el: '#app' })
+  </script>
+</html>
