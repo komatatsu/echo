@@ -2,10 +2,9 @@
 <html>
   <head>
     <script src=https://cdn.jsdelivr.net/npm/vue></script>
-      <title>調声さん</title>
+    <title>調声さん</title>
   </head>
   <body>
-    <audio id=player controls></audio>
     <div id=app>
       <recorder></recorder>
     </div>
@@ -14,6 +13,9 @@
     Vue.component('recorder', {
       template: `
       <div>
+        <div>
+          <audio id=player controls></audio>
+        </div>
         <template v-if=recording>
           <button v-on:click="stop">停止</button>
         </template>
